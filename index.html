@@ -1,0 +1,837 @@
+
+
+<!doctype html>
+
+<html lang="de">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+
+<meta name="theme-color" content="#0b0c0f">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="apple-mobile-web-app-title" content="Rummikub Score">
+
+<link rel="manifest" href="manifest.json">
+
+<link rel="apple-touch-icon" href="icon.svg">
+
+<title>Rummikub Score</title>
+
+<style>
+
+:root{color-scheme:dark;--bg:#0b0c0f;--panel:#15171c;--panel2:#1b1e24;--line:#292d35;--text:#f5f6f8;--muted:#9298a4;--accent:#d9b56d;--green:#8bd5a4;--red:#f08d8d}
+
+*{box-sizing:border-box}
+
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+
+button,input{font:inherit}
+
+button{border:0;cursor:pointer}
+
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{max-width:680px;margin:auto;padding:18px 16px 34px}
+
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+
+.brand{display:flex;gap:11px;align-items:center}
+
+.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(145deg,#f1d99b,#b88a3f);display:grid;place-items:center;color:#17130b;font-size:21px;font-weight:900;box-shadow:0 5px 22px #d9b56d20}
+
+.eyebrow{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+
+.brand h1{font-size:19px;margin:3px 0 0;letter-spacing:-.5px}
+
+.status{border:1px solid var(--line);border-radius:99px;padding:7px 10px;color:var(--muted);font-size:11px;display:flex;align-items:center;gap:6px}
+
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+
+.hero{margin-bottom:20px}
+
+.hero .eyebrow{margin-bottom:8px}
+
+.hero h2{font-size:31px;letter-spacing:-1.2px;line-height:1.08;margin:0 0 8px}
+
+.hero p{color:var(--muted);font-size:14px;line-height:1.45;margin:0}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:14px}
+
+.stat label{font-size:11px;color:var(--muted)}
+
+.stat strong{display:block;font-size:24px;letter-spacing:-.7px;margin-top:5px}
+
+.section{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;margin:13px 0}
+
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+
+.section h3{font-size:15px;margin:0;letter-spacing:-.2px}
+
+.sub{font-size:11px;color:var(--muted)}
+
+.btn{padding:12px 14px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);color:var(--text);font-size:13px;font-weight:650}
+
+.btn.primary{background:var(--accent);color:#17130b;border-color:var(--accent)}
+
+.btn.ghost{background:transparent}
+
+.btn.danger{color:var(--red)}
+
+.btn.small{padding:8px 10px;font-size:12px}
+
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+
+.input{width:100%;min-width:0;background:#0e1014;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:12px;font-size:14px}
+
+.field-label{font-size:11px;color:var(--muted);display:block;margin:0 0 7px}
+
+.add-player{display:flex;gap:8px}
+
+.add-player .input{flex:1}
+
+.player-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:7px 10px;font-size:12px;display:flex;gap:8px;align-items:center}
+
+.chip button{background:none;color:var(--muted);padding:0;font-size:15px}
+
+.round-grid{display:grid;gap:9px}
+
+.score-row{display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:10px;align-items:center;background:#101216;border:1px solid var(--line);border-radius:13px;padding:10px}
+
+.player-name{font-size:13px;font-weight:650;overflow-wrap:anywhere}
+
+.score-input{width:100%;text-align:right;background:#1b1e24;border:1px solid #30343d;border-radius:10px;color:var(--text);padding:10px;font-size:16px;font-variant-numeric:tabular-nums}
+
+.score-help{font-size:11px;color:var(--muted);line-height:1.4;margin:11px 0 14px}
+
+.table-wrap{overflow-x:auto}
+
+.table{width:100%;border-collapse:collapse;font-size:12px}
+
+.table th{text-align:left;color:var(--muted);font-weight:550;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+
+.table td{padding:12px 8px;border-bottom:1px solid #24272e;font-variant-numeric:tabular-nums}
+
+.table tr:last-child td{border-bottom:0}
+
+.rank{color:var(--muted);width:24px}
+
+.total{font-weight:750;font-size:14px}
+
+.leader{color:var(--accent)}
+
+.round-pill{display:inline-block;padding:4px 7px;border-radius:7px;background:var(--panel2);font-size:10px;color:var(--muted)}
+
+.empty{color:var(--muted);font-size:13px;line-height:1.5;padding:12px 2px}
+
+.history-item{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px}
+
+.history-item:last-child{border-bottom:0}
+
+.history-item strong{font-size:13px}
+
+.footer-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px}
+
+.footer-actions .primary{grid-column:1/-1}
+
+.note{color:var(--muted);font-size:11px;text-align:center;line-height:1.5;margin:22px 10px}
+
+.hidden{display:none!important}
+
+.modal{position:fixed;inset:0;background:#000b;backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:22px;z-index:20}
+
+.modal-card{width:100%;max-width:420px;background:#17191f;border:1px solid #373b44;border-radius:24px;padding:24px;box-shadow:0 25px 80px #0009}
+
+.modal-card h2{margin:0 0 8px;font-size:24px;letter-spacing:-.7px}
+
+.modal-card p{color:var(--muted);font-size:13px;line-height:1.5}
+
+.modal-card .input{margin:8px 0 14px}
+
+.winner-screen{position:fixed;inset:0;z-index:30;background:radial-gradient(ellipse at 50% 20%,#3b2d16 0%,#17140f 33%,#08090c 76%);display:flex;align-items:center;justify-content:center;text-align:center;padding:30px 22px env(safe-area-inset-bottom);overflow:auto}
+
+.winner-inner{max-width:440px;width:100%}
+
+.trophy{font-size:86px;filter:drop-shadow(0 12px 30px #d9b56d45);animation:float 2.5s ease-in-out infinite}
+
+.winner-kicker{color:var(--accent);letter-spacing:3px;text-transform:uppercase;font-size:11px;font-weight:800;margin:18px 0}
+
+.winner-title{font-size:42px;letter-spacing:-1.8px;line-height:1.03;margin:0}
+
+.winner-name{font-size:30px;color:var(--accent);font-weight:800;overflow-wrap:anywhere;margin:15px 0 8px}
+
+.winner-score{color:#c3c5ca;font-size:14px}
+
+.winner-standings{margin:18px 0;text-align:left}
+
+.winner-standings .history-item{border-color:#5a4827}
+
+.saved-roster{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+
+.roster-btn{border:1px solid #343842;background:#101216;color:#dfe1e6;border-radius:99px;padding:7px 10px;font-size:12px}
+
+.editing-note{color:var(--accent);font-size:12px;margin:0 0 10px}
+
+.winner-box{border:1px solid #5a4827;background:#ffffff08;border-radius:18px;padding:16px;margin:26px 0 18px}
+
+.winner-box span{font-size:11px;color:var(--muted)}
+
+.winner-box strong{display:block;font-size:25px;margin-top:4px}
+
+.winner-actions{display:grid;gap:9px}
+
+.winner-actions .btn{padding:14px}
+
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#f3f3f3;color:#111;padding:11px 15px;border-radius:99px;font-size:12px;font-weight:700;z-index:50;box-shadow:0 8px 30px #0007;white-space:nowrap}
+
+@keyframes float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-9px) rotate(3deg)}}
+
+@media(min-width:560px){.app{padding:26px 24px 40px}.stats{grid-template-columns:repeat(3,1fr)}.hero h2{font-size:38px}.score-row{grid-template-columns:minmax(0,1fr) 130px}}
+
+</style>
+
+</head>
+
+<body>
+
+<main class="app" id="app">
+
+<header class="top">
+
+<div class="brand"><div class="logo">R</div><div><div class="eyebrow">Scorekeeper</div><h1>Rummikub <span style="font-weight:400;color:var(--muted)">Score</span></h1></div></div>
+
+<div class="status"><span class="dot"></span><span id="saveStatus">Lokal gespeichert</span></div>
+
+</header>
+
+<section class="hero"><div class="eyebrow" id="gameLabel">DEIN SPIEL · LIVE</div><h2 id="headline">Jede Runde zählt.</h2><p id="subheadline">Punkte eintragen. Überblick behalten. Sieger feiern.</p></section>
+
+<div class="stats">
+
+<div class="stat"><label>Gespielte Runden</label><strong id="roundCount">0</strong></div>
+
+<div class="stat"><label>Mitspieler</label><strong id="playerCount">0</strong></div>
+
+<div class="stat"><label>Führender Punktestand</label><strong id="leaderScore">—</strong></div>
+
+</div>
+
+<section class="section" id="setupSection">
+
+<div class="section-head"><h3>Mitspieler</h3><span class="sub">Beliebig viele</span></div>
+
+<div class="add-player"><input id="playerName" class="input" maxlength="28" placeholder="Name eingeben" autocomplete="off"><button class="btn primary" id="addPlayerBtn">Hinzufügen</button></div>
+
+<div id="playerChips" class="player-chips"></div>
+
+<div class="sub" style="margin-top:14px">Spieler aus früheren Spielen</div><div id="savedRoster" class="saved-roster"></div>
+
+<div class="score-help">Tipp: Lege alle Mitspieler vor der ersten Runde an. Namen lassen sich entfernen, solange noch keine Runde erfasst wurde.</div>
+
+</section>
+
+<section class="section" id="roundSection">
+
+<div class="section-head"><div><h3 id="roundTitle">Nächste Runde</h3><div class="sub" id="roundSub" style="margin-top:5px">Punkte für jeden Spieler eintragen</div></div><span class="round-pill" id="roundPill">RUNDE 1</span></div>
+
+<div id="scoreInputs" class="round-grid"><div class="empty">Füge zuerst mindestens zwei Mitspieler hinzu.</div></div>
+
+<div class="score-help">Trage die Punkte so ein, wie ihr sie für diese Runde wertet. Positive und negative Werte sind möglich. Neue Mitspieler werden erst ab ihrer ersten Runde gewertet; ältere Runden bleiben unverändert.</div>
+
+<div id="editingNote" class="editing-note hidden">Du bearbeitest eine gespeicherte Runde.</div>
+
+<div class="btn-row"><button class="btn primary" id="saveRoundBtn">Runde speichern</button><button class="btn ghost" id="clearRoundBtn">Eingaben leeren</button><button class="btn ghost hidden" id="cancelEditBtn">Bearbeiten abbrechen</button></div>
+
+</section>
+
+<section class="section">
+
+<div class="section-head"><h3>Live-Rangliste</h3><span class="sub">Gesamtpunkte</span></div>
+
+<div id="leaderboard" class="empty">Sobald Spieler angelegt sind, erscheint hier die Rangliste.</div>
+
+</section>
+
+<section class="section">
+
+<div class="section-head"><h3>Rundenverlauf</h3><span class="sub" id="historyCount">0 Einträge</span></div>
+
+<div id="history"><div class="empty">Noch keine Runden gespeichert.</div></div>
+
+<div class="btn-row" style="margin-top:12px"><button class="btn small ghost" id="undoBtn">Letzte Runde zurücknehmen</button></div>
+
+</section>
+
+<section class="section">
+
+<div class="section-head"><h3>Spiel verwalten</h3></div>
+
+<div class="btn-row"><button class="btn" id="winnerBtn">🏆 Letztes Spiel – Sieger anzeigen</button><button class="btn" id="backupBtn">Sicherung exportieren</button><button class="btn" id="importBtn">Sicherung importieren</button><button class="btn danger" id="newGameBtn">Neues Spiel</button><input id="importFile" type="file" accept="application/json,.json" class="hidden"></div>
+
+<div class="score-help">Dein Spielstand wird automatisch auf diesem iPhone gespeichert. Exportiere gelegentlich eine Sicherung, um deine Daten auch bei gelöschten Browserdaten behalten zu können.</div>
+
+</section>
+
+<p class="note">Eine unabhängige Punkte-App für private Rummikub-Runden.<br>Deine Spielstände bleiben auf deinem Gerät.</p>
+
+</main>
+
+<div class="modal hidden" id="confirmModal"><div class="modal-card"><h2 id="modalTitle">Neues Spiel?</h2><p id="modalText">Möchtest du ein neues Spiel beginnen?</p><div class="btn-row"><button class="btn" id="modalCancel">Abbrechen</button><button class="btn primary" id="modalConfirm">Bestätigen</button></div></div></div>
+
+<div class="winner-screen hidden" id="winnerScreen"><div class="winner-inner"><div class="trophy">🏆</div><div class="winner-kicker">Spiel abgeschlossen</div><h2 class="winner-title">Der absolute<br>Gewinner</h2><div class="winner-name" id="winnerName">—</div><div class="winner-score" id="winnerScore">Endstand</div><div class="winner-box"><span>Gespielte Runden</span><strong id="winnerRounds">0</strong></div><div id="winnerStandings" class="winner-standings"></div><div class="winner-actions"><button class="btn primary" id="continueBtn">Doch weiterspielen</button><button class="btn" id="finishBtn">Spiel beenden</button></div></div></div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+
+(() => {
+
+const KEY='rummikub-score-v1';
+
+const $=id=>document.getElementById(id);
+
+let state=loadState(), pendingConfirm=null, toastTimer=null, editingRound=-1;
+
+const ROSTER_KEY='rummikub-score-roster-v1';
+
+function fresh(){
+
+return {players:[],rounds:[],gameNumber:1,gameStarted:new Date().toISOString(),finished:false,draftScores:{}}
+
+}
+
+function savedRoster(){
+
+try{return JSON.parse(localStorage.getItem(ROSTER_KEY)||'[]')}catch(e){return []}
+
+}
+
+function rememberPlayer(name){
+
+const list=savedRoster();
+
+if(!list.some(n=>n.toLowerCase()===name.toLowerCase())){
+
+list.push(name);
+
+localStorage.setItem(ROSTER_KEY,JSON.stringify(list))
+
+}
+
+}
+
+function loadState(){
+
+try{
+
+const s=JSON.parse(localStorage.getItem(KEY));
+
+if(s&&Array.isArray(s.players)&&Array.isArray(s.rounds))return s
+
+}catch(e){}
+
+return fresh()
+
+}
+
+function persist(){
+
+try{
+
+localStorage.setItem(KEY,JSON.stringify(state));
+
+$('saveStatus').textContent='Automatisch gespeichert'
+
+}catch(e){
+
+$('saveStatus').textContent='Speicher prüfen';
+
+showToast('Speichern nicht möglich – bitte Sicherung exportieren.')
+
+}
+
+}
+
+function totals(){
+
+return state.players.map(p=>({
+
+id:p.id,
+
+name:p.name,
+
+total:state.rounds.reduce((sum,r)=>sum+(Number(r.scores[p.id])||0),0),
+
+rounds:state.rounds.filter(r=>Object.prototype.hasOwnProperty.call(r.scores,p.id)).length
+
+})).sort((a,b)=>a.total-b.total)
+
+}
+
+function esc(s){
+
+return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
+
+}
+
+function showToast(msg){
+
+$('toast').textContent=msg;
+
+$('toast').classList.remove('hidden');
+
+clearTimeout(toastTimer);
+
+toastTimer=setTimeout(()=>$('toast').classList.add('hidden'),2300)
+
+}
+
+function render(){
+
+const hasRounds=state.rounds.length>0;
+
+$('roundCount').textContent=state.rounds.length;
+
+$('playerCount').textContent=state.players.length;
+
+const sorted=totals();
+
+$('leaderScore').textContent=sorted.length?sorted[0].total:'—';
+
+$('gameLabel').textContent=`SPIEL ${state.gameNumber} · ${state.finished?'ABGESCHLOSSEN':'LIVE'}`;
+
+$('headline').textContent=state.finished?'Gut gespielt.':'Jede Runde zählt.';
+
+$('subheadline').textContent=state.finished?'Das Spiel ist beendet. Du kannst ein neues Spiel starten.':'Punkte eintragen. Überblick behalten. Sieger feiern.';
+
+$('playerChips').innerHTML=state.players.length?state.players.map(p=>`<span class="chip">${esc(p.name)}${!hasRounds?`<button aria-label="Spieler entfernen" data-remove="${p.id}">×</button>`:''}</span>`).join(''):'<span class="sub">Noch keine Mitspieler hinzugefügt</span>';
+
+$('playerChips').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{
+
+state.players=state.players.filter(p=>p.id!==b.dataset.remove);
+
+persist();render()
+
+});
+
+const roster=savedRoster().filter(n=>!state.players.some(p=>p.name.toLowerCase()===n.toLowerCase()));
+
+$('savedRoster').innerHTML=roster.length?roster.map(n=>`<button class="roster-btn" data-roster="${esc(n)}">+ ${esc(n)}</button>`).join(''):'<span class="sub">Noch keine gespeicherten Namen</span>';
+
+$('savedRoster').querySelectorAll('[data-roster]').forEach(b=>b.onclick=()=>{
+
+$('playerName').value=b.dataset.roster;
+
+addPlayer()
+
+});
+
+$('setupSection').classList.toggle('hidden',state.finished);
+
+$('setupSection').querySelector('.score-help').textContent=hasRounds
+
+?'Du kannst auch während des Spiels weitere Mitspieler hinzufügen. Für neue Spieler zählen nur die Runden ab ihrem Einstieg; frühere Runden werden nicht nachträglich gewertet.'
+
+:'Lege alle Mitspieler vor der ersten Runde an. Du kannst aber auch später weitere Personen hinzufügen.';
+
+const displayRound=editingRound>=0?editingRound+1:state.rounds.length+1;
+
+$('roundTitle').textContent=editingRound>=0?`Runde ${displayRound} bearbeiten`:`Runde ${displayRound}`;
+
+$('roundPill').textContent=`RUNDE ${displayRound}`;
+
+$('editingNote').classList.toggle('hidden',editingRound<0);
+
+$('cancelEditBtn').classList.toggle('hidden',editingRound<0);
+
+$('saveRoundBtn').textContent=editingRound>=0?'Änderungen speichern':'Runde speichern';
+
+$('roundSub').textContent=state.finished?'Spiel beendet – starte ein neues Spiel zum Weiterspielen':'Punkte für jeden Spieler eintragen';
+
+$('scoreInputs').innerHTML=state.players.length>=2?state.players.map(p=>{
+
+const old=editingRound>=0?state.rounds[editingRound]?.scores?.[p.id]:undefined;
+
+const draft=state.draftScores?.[p.id];
+
+const value=old!==undefined?old:(draft!==undefined?draft:'');
+
+return `<label class="score-row"><span class="player-name">${esc(p.name)}</span><input class="score-input" type="number" inputmode="decimal" step="1" data-score="${p.id}" value="${value}" placeholder="0" aria-label="Punkte für ${esc(p.name)}" ${state.finished||(editingRound>=0&&p.joinedAtRound>editingRound+1)?'disabled':''}></label>`
+
+}).join(''):'<div class="empty">Füge zuerst mindestens zwei Mitspieler hinzu.</div>';
+
+$('scoreInputs').querySelectorAll('[data-score]').forEach(input=>input.addEventListener('input',()=>{
+
+state.draftScores=state.draftScores||{};
+
+state.draftScores[input.dataset.score]=input.value;
+
+persist()
+
+}));
+
+$('saveRoundBtn').disabled=state.players.length<2||state.finished;
+
+$('saveRoundBtn').style.opacity=$('saveRoundBtn').disabled?'.45':'1';
+
+$('clearRoundBtn').disabled=state.finished;
+
+$('leaderboard').innerHTML=sorted.length?`<div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Spieler</th><th>Runden</th><th>Gesamt</th></tr></thead><tbody>${sorted.map((p,i)=>`<tr><td class="rank">${i===0?'★':i+1}</td><td>${esc(p.name)}</td><td>${p.rounds}${state.players.find(x=>x.id===p.id).joinedAtRound>1?' <span class="sub">· ab R'+state.players.find(x=>x.id===p.id).joinedAtRound+'</span>':''}</td><td class="total ${i===0?'leader':''}">${p.total>0?'+':''}${p.total}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Sobald Spieler angelegt sind, erscheint hier die Rangliste.</div>';
+
+$('historyCount').textContent=`${state.rounds.length} ${state.rounds.length===1?'Eintrag':'Einträge'}`;
+
+$('history').innerHTML=hasRounds?[...state.rounds].map((r,idx)=>({r,idx})).reverse().map(({r,idx})=>`<div class="history-item"><div><strong>Runde ${idx+1}</strong><div class="sub" style="margin-top:4px">${new Date(r.date).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div><button class="btn small ghost" style="margin-top:8px" data-edit-round="${idx}" ${state.finished?'disabled':''}>Bearbeiten</button></div><div style="text-align:right">${state.players.map(p=>Object.prototype.hasOwnProperty.call(r.scores,p.id)?`<div>${esc(p.name)}: <b>${(Number(r.scores[p.id])||0)>0?'+':''}${Number(r.scores[p.id])||0}</b></div>`:`<div class="sub">${esc(p.name)}: noch nicht dabei</div>`).join('')}</div></div>`).join(''):'<div class="empty">Noch keine Runden gespeichert.</div>';
+
+$('history').querySelectorAll('[data-edit-round]').forEach(b=>b.onclick=()=>{
+
+editingRound=Number(b.dataset.editRound);
+
+state.draftScores={};
+
+render();
+
+$('roundSection').scrollIntoView({behavior:'smooth',block:'start'})
+
+});
+
+$('undoBtn').disabled=!hasRounds||state.finished;
+
+$('undoBtn').style.opacity=$('undoBtn').disabled?'.4':'1';
+
+}
+
+function addPlayer(){
+
+if(state.finished){showToast('Bitte starte zuerst ein neues Spiel.');return}
+
+const name=$('playerName').value.trim();
+
+if(!name)return showToast('Bitte einen Namen eingeben.');
+
+if(state.players.some(p=>p.name.toLowerCase()===name.toLowerCase()))return showToast('Diesen Namen gibt es bereits.');
+
+const joinedAtRound=state.rounds.length+1;
+
+const id=crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random());
+
+state.players.push({id,name,joinedAtRound});
+
+rememberPlayer(name);
+
+state.draftScores=state.draftScores||{};
+
+state.draftScores[id]='';
+
+$('playerName').value='';
+
+persist();
+
+render();
+
+showToast(joinedAtRound>1?`${name} steigt ab Runde ${joinedAtRound} ein`:`${name} hinzugefügt`)
+
+}
+
+function saveRound(){
+
+if(state.finished||state.players.length<2)return;
+
+const scores={};
+
+document.querySelectorAll('[data-score]').forEach(input=>{
+
+scores[input.dataset.score]=input.value.trim()===''?0:Number(input.value)
+
+});
+
+if(Object.values(scores).some(v=>!Number.isFinite(v)))return showToast('Bitte gültige Punktzahlen eingeben.');
+
+if(editingRound>=0){
+
+const original=state.rounds[editingRound].scores||{};
+
+const corrected={};
+
+state.players.forEach(p=>{
+
+if(Object.prototype.hasOwnProperty.call(original,p.id)||p.joinedAtRound<=editingRound+1)corrected[p.id]=scores[p.id]??original[p.id]??0
+
+});
+
+state.rounds[editingRound].scores=corrected;
+
+state.rounds[editingRound].editedAt=new Date().toISOString();
+
+editingRound=-1;
+
+showToast('Runde korrigiert · Rangliste aktualisiert')
+
+}else{
+
+state.rounds.push({date:new Date().toISOString(),scores});
+
+showToast('Runde gespeichert · Rangliste aktualisiert')
+
+}
+
+state.draftScores={};
+
+persist();
+
+render()
+
+}
+
+function clearInputs(){
+
+document.querySelectorAll('[data-score]').forEach(i=>i.value='');
+
+state.draftScores={};
+
+persist()
+
+}
+
+function cancelEdit(){
+
+editingRound=-1;
+
+state.draftScores={};
+
+persist();
+
+render()
+
+}
+
+function ask(title,text,confirmLabel,fn){
+
+$('modalTitle').textContent=title;
+
+$('modalText').textContent=text;
+
+$('modalConfirm').textContent=confirmLabel;
+
+pendingConfirm=fn;
+
+$('confirmModal').classList.remove('hidden')
+
+}
+
+function closeModal(){
+
+$('confirmModal').classList.add('hidden');
+
+pendingConfirm=null
+
+}
+
+function showWinner(){
+
+if(state.players.length<1)return showToast('Lege zuerst Mitspieler an.');
+
+if(state.rounds.length<1)return showToast('Speichere mindestens eine Runde.');
+
+const sorted=totals();
+
+const winner=sorted[0];
+
+$('winnerName').textContent=winner.name;
+
+$('winnerScore').textContent=`${winner.total>0?'+':''}${winner.total} Gesamtpunkte`;
+
+$('winnerRounds').textContent=state.rounds.length;
+
+$('winnerStandings').innerHTML='<div class="sub" style="margin-bottom:8px">Endplatzierungen</div>'+sorted.map((p,i)=>`<div class="history-item"><div><strong>${i+1}. ${esc(p.name)}</strong><div class="sub">${p.rounds} gewertete Runden</div></div><strong>${p.total>0?'+':''}${p.total} Punkte</strong></div>`).join('');
+
+state.finished=true;
+
+persist();
+
+render();
+
+$('winnerScreen').classList.remove('hidden')
+
+}
+
+function newGame(){
+
+const oldNames=state.players.map(p=>p.name);
+
+ask('Neues Spiel starten?','Der aktuelle Spielstand wird ersetzt. Spielernamen bleiben für spätere Spiele gespeichert. Exportiere vorher bei Bedarf eine Sicherung.','Neues Spiel',()=>{
+
+oldNames.forEach(rememberPlayer);
+
+const nextNo=(Number(state.gameNumber)||1)+1;
+
+state=fresh();
+
+state.gameNumber=nextNo;
+
+editingRound=-1;
+
+persist();
+
+$('winnerScreen').classList.add('hidden');
+
+render();
+
+closeModal();
+
+showToast('Neues Spiel bereit')
+
+})
+
+}
+
+function exportBackup(){
+
+const blob=new Blob([JSON.stringify({format:'RummikubScoreBackup',version:1,exportedAt:new Date().toISOString(),state},null,2)],{type:'application/json'});
+
+const url=URL.createObjectURL(blob);
+
+const a=document.createElement('a');
+
+a.href=url;
+
+a.download=`rummikub-sicherung-${new Date().toISOString().slice(0,10)}.json`;
+
+a.click();
+
+setTimeout(()=>URL.revokeObjectURL(url),1500);
+
+showToast('Sicherung wird exportiert')
+
+}
+
+function importBackup(file){
+
+if(!file)return;
+
+const reader=new FileReader();
+
+reader.onload=()=>{
+
+try{
+
+const d=JSON.parse(reader.result),s=d.state||d;
+
+if(!Array.isArray(s.players)||!Array.isArray(s.rounds))throw Error();
+
+ask('Sicherung importieren?','Der aktuelle Spielstand wird durch die ausgewählte Sicherung ersetzt.','Importieren',()=>{
+
+state=s;
+
+persist();
+
+render();
+
+$('winnerScreen').classList.add('hidden');
+
+closeModal();
+
+showToast('Sicherung importiert')
+
+})
+
+}catch(e){showToast('Diese Sicherungsdatei ist ungültig.')}
+
+};
+
+reader.readAsText(file)
+
+}
+
+$('addPlayerBtn').onclick=addPlayer;
+
+$('playerName').addEventListener('keydown',e=>{if(e.key==='Enter')addPlayer()});
+
+$('saveRoundBtn').onclick=saveRound;
+
+$('clearRoundBtn').onclick=clearInputs;
+
+$('cancelEditBtn').onclick=cancelEdit;
+
+$('undoBtn').onclick=()=>ask('Letzte Runde zurücknehmen?','Die zuletzt gespeicherte Runde wird entfernt und die Rangliste neu berechnet.','Zurücknehmen',()=>{
+
+state.rounds.pop();
+
+editingRound=-1;
+
+state.draftScores={};
+
+persist();
+
+render();
+
+closeModal();
+
+showToast('Letzte Runde entfernt')
+
+});
+
+$('winnerBtn').onclick=showWinner;
+
+$('newGameBtn').onclick=newGame;
+
+$('backupBtn').onclick=exportBackup;
+
+$('importBtn').onclick=()=>$('importFile').click();
+
+$('importFile').onchange=e=>{importBackup(e.target.files[0]);e.target.value=''};
+
+$('modalCancel').onclick=closeModal;
+
+$('modalConfirm').onclick=()=>{if(pendingConfirm)pendingConfirm()};
+
+$('continueBtn').onclick=()=>{
+
+$('winnerScreen').classList.add('hidden');
+
+state.finished=false;
+
+persist();
+
+render();
+
+showToast('Du kannst weiterspielen')
+
+};
+
+$('finishBtn').onclick=()=>{
+
+$('winnerScreen').classList.add('hidden');
+
+state.finished=true;
+
+persist();
+
+render();
+
+showToast('Spiel beendet')
+
+};
+
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+
+render();
+
+})();
+
+</script>
+
+</body>
+
+</html>
